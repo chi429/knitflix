@@ -293,7 +293,8 @@ async function runOverpass(origin, radius, keyword) {
     `nwr${around}[craft=knitting]${nameFilter};`,
     `nwr${around}[craft=sewing]${nameFilter};`
   ];
-  const query = `[out:json][timeout:25];(${selectors.join('')})out center tags;`;
+  // Semicolon required after union block before `out` (Overpass QL grammar).
+  const query = `[out:json][timeout:25];(${selectors.join('')}); out center tags;`;
 
   try {
     const json = await postOverpassQuery(query);

@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Knitflix</title>
+<meta name="description" content="Cute pastel knitting &amp; crochet toolkit prototype (HTML/CSS/JS).">
+<meta name="theme-color" content="#7c66ff">
+<link rel="manifest" href="./site.webmanifest">
+<link rel="icon" href="./assets/icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="./assets/icons/icon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+HK:wght@400;500;700;900&family=Silkscreen:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./assets/css/pixelarticons.css">
+<link rel="stylesheet" href="./assets/css/app.css">
+<script>
+  window.SHOPS_ENDPOINT = 'https://script.google.com/macros/s/AKfycbxz6j4JxRGMz57GVPwERy3j082NB4p1k_-AYxZYdGGDzUWbjfhLbPIqcGO9P00LCl0W/exec';
+</script>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="app-header">
+  <div class="knitflix-logo">
+    <span class="logo-k">K<span class="logo-needle-pixel"></span></span>
+    <span class="logo-nit">nit</span>
+    <span class="logo-flix">flix</span>
+  </div>
+  <button class="lang-btn" onclick="toggleLang()" id="langBtn">EN</button>
+</header>
+
+<!-- TOAST -->
+<div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true">
+  <span id="toastMsg"></span>
+  <button class="toast-undo" id="toastUndo" onclick="undoReset()" data-zh="復原" data-en="Undo">復原</button>
+</div>
+
+<!-- SWIPE CONTAINER -->
+<div class="swipe-container" id="swipeContainer">
+  <div class="panels-track" id="panelsTrack">
+
+    <!-- 0: HOME -->
+    <div class="panel" id="p-home">
+      <div class="home-hero">
+        <div class="hero-tag" data-zh="歡迎回來" data-en="Welcome back">歡迎回來</div>
+        <div class="hero-name"><em>Knit</em>flix</div>
+        <div class="hero-sub" data-zh="你嘅織冷工具箱" data-en="Your knitting & crochet toolkit">你嘅織冷工具箱</div>
+        <div class="row-resume" onclick="goTo(2)" role="button" tabindex="0" aria-label="Continue to Row Counter">
+          <div>
+            <div class="resume-lbl" data-zh="上次行數" data-en="Last row">上次行數</div>
+            <div class="resume-val" id="heroRowVal">0 <span style="font-size:16px;font-weight:300" data-zh="行" data-en="rows">行</span></div>
+            <div class="resume-sub" data-zh="點擊繼續 →" data-en="Tap to continue →">點擊繼續 →</div>
+          </div>
+          <div>
+            <div class="resume-prog-track"><div class="resume-prog-fill" id="heroProgFill" style="width:0%"></div></div>
+            <div class="resume-prog-pct" id="heroProgPct">0%</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="dash-section" data-zh="常用工具" data-en="Quick Tools">常用工具</div>
+      <div class="quick-grid">
+        <div class="quick-card" onclick="goTo(1)" role="button" tabindex="0" aria-label="Open Yarn Calculator">
+          <div class="qc-icon"><i class="pix-device-calculator" style="font-size:28px;color:var(--rust)"></i></div>
+          <div class="qc-name" data-zh="用線計算" data-en="Yarn Calc">用線計算</div>
+          <div class="qc-desc" data-zh="預測用量 / 計剩餘" data-en="Predict & remaining">預測用量 / 計剩餘</div>
+        </div>
+        <div class="quick-card" onclick="goTo(2)" role="button" tabindex="0" aria-label="Open Row Counter">
+          <div class="qc-icon"><i class="pix-list" style="font-size:28px;color:var(--sage)"></i></div>
+          <div class="qc-name" data-zh="行數記錄" data-en="Row Counter">行數記錄</div>
+          <div class="qc-desc" data-zh="繼續上次進度" data-en="Continue last session">繼續上次進度</div>
+        </div>
+      </div>
+
+      <div class="dash-section" data-zh="參考資料" data-en="References">參考資料</div>
+      <div class="quick-card-wide" onclick="goTo(3)" role="button" tabindex="0" aria-label="Open HK Yarn Shops">
+        <div class="qw-icon"><i class="pix-map-pin" style="font-size:26px;color:var(--rust)"></i></div>
+        <div>
+          <div class="qw-name" data-zh="香港線材舖" data-en="HK Yarn Shops">香港線材舖</div>
+          <div class="qw-desc" data-zh="8 間實體 + 網上舖頭" data-en="8 physical & online shops">8 間實體 + 網上舖頭</div>
+        </div>
+      </div>
+      <div class="quick-card-wide" onclick="goTo(4)" role="button" tabindex="0" aria-label="Open Yarn Wiki">
+        <div class="qw-icon"><i class="pix-box" style="font-size:26px;color:var(--gold)"></i></div>
+        <div>
+          <div class="qw-name" data-zh="線材 Wiki" data-en="Yarn Wiki">線材 Wiki</div>
+          <div class="qw-desc" data-zh="8 種纖維特性、保養、用途" data-en="8 fibers — properties, care & uses">8 種纖維特性、保養、用途</div>
+        </div>
+      </div>
+      <div class="quick-card-wide" onclick="goTo(4.5)" role="button" tabindex="0" aria-label="Open Symbols and Sizes reference">
+        <div class="qw-icon"><i class="pix-book-open" style="font-size:26px;color:var(--sage)"></i></div>
+        <div>
+          <div class="qw-name" data-zh="符號 & 針號" data-en="Symbols & Sizes">符號 &amp; 針號</div>
+          <div class="qw-desc" data-zh="鈎針 / 針織 / UK↔US / 針號換算" data-en="Crochet / Knitting / UK↔US / Sizes">鈎針 / 針織 / UK↔US / Sizes</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 1: CALC -->
+    <div class="panel" id="p-calc">
+      <div class="page-head">
+        <div class="page-title">用線<em>計算</em></div>
+        <div class="page-sub" data-zh="根據密度樣本計算用量" data-en="Calculate from tension swatch">根據密度樣本計算用量</div>
+      </div>
+      <div class="chip-row" id="calcChips">
+        <button class="chip on" onclick="setCalcMode('predict',this)" data-zh="預測用量" data-en="Predict">預測用量</button>
+        <button class="chip" onclick="setCalcMode('remain',this)" data-zh="計算剩餘" data-en="Remaining">計算剩餘</button>
+      </div>
+      <div id="m-predict">
+        <div class="card">
+          <div class="card-label" style="display:flex;align-items:center;gap:0">
+            <span data-zh="密度樣本 Tension Swatch" data-en="Tension Swatch">密度樣本 Tension Swatch</span>
+            <button class="swatch-help" onclick="toggleSwatchTip()" aria-label="What is a tension swatch?">?</button>
+            <span style="flex:1;height:2px;background:var(--grid-line);margin-left:var(--s-2);display:block"></span>
+          </div>
+          <div class="swatch-tip-box" id="swatchTip" data-zh="織一塊 10×10cm 嘅測試方塊，數出裡面有幾多針（橫）同幾多行（直），再秤重量。呢個幫你準確計算成品用線量。" data-en="Knit or crochet a 10×10cm test square. Count stitches across (horizontal) and rows down (vertical), then weigh it in grams. This gives you an accurate yarn estimate for your finished piece.">織一塊 10×10cm 嘅測試方塊，數出裡面有幾多針（橫）同幾多行（直），再秤重量。呢個幫你準確計算成品用線量。</div>
+          <div class="row2">
+            <div>
+              <label data-zh="針數 /10cm" data-en="Stitches/10cm">針數 /10cm</label>
+              <input type="number" id="sSt" placeholder="20" min="1" oninput="clearErr(this)">
+              <div class="field-err" id="err-sSt" data-zh="請填入針數" data-en="Enter stitch count">請填入針數</div>
+            </div>
+            <div>
+              <label data-zh="行數 /10cm" data-en="Rows/10cm">行數 /10cm</label>
+              <input type="number" id="sRw" placeholder="24" min="1" oninput="clearErr(this)">
+              <div class="field-err" id="err-sRw" data-zh="請填入行數" data-en="Enter row count">請填入行數</div>
+            </div>
+          </div>
+          <label data-zh="樣本用線 g (10×10cm)" data-en="Yarn used g (10×10cm)">樣本用線 g (10×10cm)</label>
+          <input type="number" id="sGm" placeholder="5" step="0.1" min="0.1" oninput="clearErr(this)">
+          <div class="field-err" id="err-sGm" data-zh="請填入樣本重量" data-en="Enter yarn weight">請填入樣本重量</div>
+        </div>
+        <div class="card">
+          <div class="card-label" data-zh="成品尺寸" data-en="Finished Size">成品尺寸</div>
+          <div class="row2">
+            <div>
+              <label data-zh="闊 cm" data-en="Width cm">闊 cm</label>
+              <input type="number" id="pW" placeholder="50" min="1" oninput="clearErr(this)">
+              <div class="field-err" id="err-pW" data-zh="請填入闊度" data-en="Enter width">請填入闊度</div>
+            </div>
+            <div>
+              <label data-zh="長 cm" data-en="Length cm">長 cm</label>
+              <input type="number" id="pH" placeholder="60" min="1" oninput="clearErr(this)">
+              <div class="field-err" id="err-pH" data-zh="請填入長度" data-en="Enter length">請填入長度</div>
+            </div>
+          </div>
+          <label data-zh="每球 gram（選填）" data-en="Grams/ball (optional)">每球 gram（選填）</label>
+          <input type="number" id="bG" placeholder="100">
+          <button class="btn" onclick="calcYarn()" data-zh="計算用量 →" data-en="Calculate →">計算用量 →</button>
+        </div>
+        <div class="result-box" id="r-yarn">
+          <div class="result-lbl" data-zh="預計需要" data-en="Estimated">預計需要</div>
+          <div class="result-val" id="r-yarn-g">—</div>
+          <div class="result-note" id="r-yarn-n"></div>
+        </div>
+      </div>
+      <div id="m-remain" style="display:none">
+        <div class="card">
+          <div class="card-label" data-zh="已完成部分" data-en="Completed So Far">已完成部分</div>
+          <div class="row2">
+            <div>
+              <label data-zh="已織行數" data-en="Rows done">已織行數</label>
+              <input type="number" id="dR" placeholder="30" min="1" oninput="clearErr(this)">
+              <div class="field-err" id="err-dR" data-zh="請填入已織行數" data-en="Enter rows done">請填入已織行數</div>
+            </div>
+            <div>
+              <label data-zh="總行數" data-en="Total rows">總行數</label>
+              <input type="number" id="tR" placeholder="100" min="1" oninput="clearErr(this)">
+              <div class="field-err" id="err-tR" data-zh="請填入總行數" data-en="Enter total rows">請填入總行數</div>
+            </div>
+          </div>
+          <label data-zh="已用線 g" data-en="Yarn used g">已用線 g</label>
+          <input type="number" id="uG" placeholder="80" step="0.1" min="0.1" oninput="clearErr(this)">
+          <div class="field-err" id="err-uG" data-zh="請填入已用線量" data-en="Enter yarn used">請填入已用線量</div>
+          <button class="btn" onclick="calcRemain()" data-zh="計算剩餘 →" data-en="Calculate →">計算剩餘 →</button>
+        </div>
+        <div class="result-box" id="r-rem">
+          <div class="result-lbl" data-zh="仍需用線" data-en="Still needed">仍需用線</div>
+          <div class="result-val" id="r-rem-g">—</div>
+          <div class="result-note" id="r-rem-n"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2: COUNTER -->
+    <div class="panel" id="p-count">
+      <div class="page-head">
+        <div class="page-title">行數<em>記錄</em></div>
+        <div class="page-sub" data-zh="追蹤織到第幾行" data-en="Track your current row">追蹤織到第幾行</div>
+      </div>
+      <div class="card">
+        <div class="counter-wrap">
+          <span class="counter-num" id="rowNum">0</span>
+          <div class="counter-lbl" data-zh="行" data-en="rows">行</div>
+        </div>
+        <div class="counter-btns">
+          <button class="c-btn c-minus" onclick="changeRow(-1,this)" aria-label="Decrease row">−</button>
+          <button class="c-btn c-plus" onclick="changeRow(1,this)" aria-label="Increase row">+</button>
+        </div>
+        <div style="text-align:center;margin-top:var(--s-4);">
+          <button class="c-reset" onclick="resetRow()" data-zh="重設" data-en="Reset" aria-label="Reset row counter">重設</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-label" data-zh="目標行數" data-en="Target Rows">目標行數</div>
+        <label data-zh="設定目標" data-en="Set target">設定目標</label>
+        <input type="number" id="tgtRow" placeholder="100" oninput="updateProg()">
+        <div class="progress-track"><div class="progress-fill" id="progFill" style="width:0%"></div></div>
+        <div class="prog-meta">
+          <span id="progRowLabel" style="color:var(--ink3)">—</span>
+          <span id="progTxt" class="prog-pct">0%</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3: SHOPS -->
+    <div class="panel" id="p-shops">
+      <div class="page-head">
+        <div class="page-title">香港<em>線材舖</em></div>
+        <div class="page-sub" data-zh="8 間實體 + 網上舖頭" data-en="8 physical & online shops">8 間實體 + 網上舖頭</div>
+      </div>
+      <div class="chip-row" id="shopModeChips" aria-label="Shop source">
+        <button class="chip on" onclick="setShopMode('curated',this)" data-zh="編輯推介" data-en="Editor’s picks">編輯推介</button>
+        <button class="chip" onclick="setShopMode('osm',this)" data-zh="附近搜尋" data-en="Nearby search (OSM)">附近搜尋</button>
+      </div>
+
+      <!-- Curated (Sheet) -->
+      <div id="shopsCurated">
+        <input class="shop-search" id="shopQ" placeholder="搜尋舖頭或地區… / Search…" oninput="renderShops()">
+        <div class="u-txt-12 u-txt-muted u-mt-5" id="shopSourceLine" style="margin-bottom:var(--s-2)"></div>
+        <button class="chip" id="shopFilterBtn" onclick="toggleShopFilters()" data-zh="篩選地區" data-en="Filter by area" style="margin-bottom:var(--s-3)">篩選地區</button>
+        <div class="chip-row is-hidden" id="areaChips" aria-label="Area filters">
+          <button class="chip on" data-area="all" onclick="setArea(this)" data-zh="全部" data-en="All">全部</button>
+          <button class="chip" data-area="hki" onclick="setArea(this)" data-zh="香港島" data-en="HK Island">香港島</button>
+          <button class="chip" data-area="kln" onclick="setArea(this)" data-zh="九龍" data-en="Kowloon">九龍</button>
+          <button class="chip" data-area="nt" onclick="setArea(this)" data-zh="新界" data-en="N.T.">新界</button>
+          <button class="chip" data-area="online" onclick="setArea(this)" data-zh="網上" data-en="Online">網上</button>
+        </div>
+        <div id="shopList"></div>
+        <div class="tip-banner" data-zh="提示：名單由 Google Sheet 同步。資料截至 2025 年；出發前建議致電或查 IG 確認。" data-en="Tip: This list syncs from Google Sheet. Data as of 2025; call or check IG before visiting.">提示：名單由 Google Sheet 同步。資料截至 2025 年；出發前建議致電或查 IG 確認。</div>
+      </div>
+
+      <!-- OSM (live) -->
+      <div id="shopsOsm" class="is-hidden">
+          <div class="card">
+          <div class="card-label" data-zh="附近搜尋（OpenStreetMap）" data-en="Nearby search (OpenStreetMap)">附近搜尋（OpenStreetMap）</div>
+          <div class="row2">
+            <div>
+              <label data-zh="半徑（米）" data-en="Radius (meters)">半徑（米）</label>
+              <select id="osmRadius" aria-label="Radius (meters)">
+                <option value="200">200m</option>
+                <option value="500">500m</option>
+                <option value="1000">1000m</option>
+                <option value="1500" selected>1500m</option>
+                <option value="2000">2000m</option>
+                <option value="3000">3000m</option>
+                <option value="5000">5000m</option>
+                <option value="8000">8000m</option>
+                <option value="12000">12000m</option>
+                <option value="20000">20000m</option>
+              </select>
+            </div>
+            <div>
+              <label data-zh="關鍵字（選填）" data-en="Keyword (optional)">關鍵字（選填）</label>
+              <input type="text" id="osmKeyword" placeholder="毛糸 / yarn / 手芸…" class="shop-search">
+            </div>
+          </div>
+          <button class="btn" onclick="searchOsmShops()" data-zh="用我位置搜尋 →" data-en="Search using my location →">用我位置搜尋 →</button>
+          <button
+            class="chip chip-as-label on"
+            id="osmPlaceToggle"
+            onclick="toggleOsmPlaceOptions()"
+            aria-controls="osmPlaceWrap"
+            aria-expanded="true"
+            data-zh="唔用定位：輸入地區"
+            data-en="No GPS: search by place"
+          ><span class="tog-label">唔用定位：輸入地區</span><span class="pix-toggle-ui" aria-hidden="true"></span></button>
+          <div id="osmPlaceWrap" style="margin-top:var(--s-2);">
+            <label data-zh="地區 / 城市" data-en="Area / City">地區 / 城市</label>
+            <input type="text" id="osmPlace" class="shop-search" placeholder="例如：旺角 / Mong Kok / Tokyo" style="margin-bottom:var(--s-2)">
+            <button class="btn" onclick="searchOsmByPlace(true)" data-zh="用地區搜尋 →" data-en="Search this place →">用地區搜尋 →</button>
+          </div>
+          <div style="margin-top:var(--s-2);font-size:12px;color:var(--ink3);line-height:1.6;" data-zh="會向你要求定位權限（只用嚟搵附近舖頭，唔會儲存）。資料來自 OpenStreetMap，結果可能因地區而有差異。" data-en="We’ll ask for location permission (only used to find nearby shops; nothing is stored). Data from OpenStreetMap; coverage varies by area.">會向你要求定位權限（只用嚟搵附近舖頭，唔會儲存）。資料來自 OpenStreetMap，結果可能因地區而有差異。</div>
+        </div>
+        <div class="u-txt-12 u-txt-muted u-mt-5" id="osmSourceLine"></div>
+        <div id="osmStatus" style="text-align:center;padding:var(--s-3) 0;color:var(--ink3);font-size:12px;"></div>
+        <div id="osmActions" class="chip-row is-hidden" aria-label="OSM actions">
+          <button class="chip" onclick="retryOsmSearch()" data-zh="再試一次" data-en="Retry">再試一次</button>
+        </div>
+        <div id="osmShopList"></div>
+      </div>
+    </div>
+
+    <!-- 4: WIKI -->
+    <div class="panel" id="p-wiki">
+      <div class="page-head">
+        <div class="page-title">線材<em>Wiki</em></div>
+        <div class="page-sub" data-zh="纖維特性、保養、用途" data-en="Fiber properties, care & uses">纖維特性、保養、用途</div>
+      </div>
+      <input class="shop-search" id="wikiQ" placeholder="搜尋線材… / Search fiber…" oninput="renderWiki()">
+      <div id="fiberList"></div>
+    </div>
+
+    <!-- 5: REFERENCE -->
+    <div class="panel" id="p-ref">
+      <div class="page-head">
+        <div class="page-title">符號<em>參考</em></div>
+        <div class="page-sub" data-zh="符號對照 · 針號換算" data-en="Symbol guide · Needle sizes">符號對照 · 針號換算</div>
+      </div>
+      <div class="pill-row" id="refToggle">
+        <button class="pill-btn active" onclick="setRef('sym-crochet',this)" data-zh="鈎針" data-en="Crochet">鈎針</button>
+        <button class="pill-btn" onclick="setRef('sym-knit',this)" data-zh="針織" data-en="Knitting">針織</button>
+        <button class="pill-btn" onclick="setRef('uk-us',this)" data-zh="UK↔US" data-en="UK↔US">UK↔US</button>
+        <button class="pill-btn" onclick="setRef('hook-sz',this)" data-zh="鈎針號" data-en="Hooks">鈎針號</button>
+        <button class="pill-btn" onclick="setRef('knit-sz',this)" data-zh="棒針號" data-en="Needles">棒針號</button>
+      </div>
+      <div class="card" id="sym-crochet">
+        <div class="sym-table" id="symCrochetTable"></div>
+      </div>
+      <div class="card" id="sym-knit" style="display:none">
+        <div class="sym-table" id="symKnitTable"></div>
+      </div>
+      <div class="card" id="uk-us" style="display:none">
+        <div class="sym-table" id="ukUsTable"></div>
+        <div class="tip-banner" data-zh="US 同 UK 術語係唔同嘅！同一名稱代表唔同針法。" data-en="US and UK use the same words for DIFFERENT stitches!">US 同 UK 術語係唔同嘅！同一名稱代表唔同針法。</div>
+      </div>
+      <div class="card" id="hook-sz" style="display:none">
+        <div id="hookSizeTable"></div>
+      </div>
+      <div class="card" id="knit-sz" style="display:none">
+        <div id="needleSizeTable"></div>
+      </div>
+    </div>
+
+  </div><!-- /panels-track -->
+</div><!-- /swipe-container -->
+
+<!-- TAB BAR -->
+<nav class="tab-bar" id="tabBar" aria-label="Primary">
+  <button class="tab-item active" onclick="goTo(0)" aria-label="Home" aria-current="page">
+    <span class="t-icon"><i class="pix-home"></i></span>
+    <span class="t-lbl" data-zh="主頁" data-en="Home">主頁</span>
+  </button>
+  <button class="tab-item" onclick="goTo(1)" aria-label="Calculator">
+    <span class="t-icon"><i class="pix-device-calculator"></i></span>
+    <span class="t-lbl" data-zh="計算" data-en="Calc">計算</span>
+  </button>
+  <button class="tab-item" onclick="goTo(2)" aria-label="Rows">
+    <span class="t-icon"><i class="pix-list"></i></span>
+    <span class="t-lbl" data-zh="行數" data-en="Rows">行數</span>
+  </button>
+  <button class="tab-item" onclick="goTo(3)" aria-label="Shops">
+    <span class="t-icon"><i class="pix-map-pin"></i></span>
+    <span class="t-lbl" data-zh="舖頭" data-en="Shops">舖頭</span>
+  </button>
+  <button class="tab-item" onclick="goTo(4)" aria-label="Wiki">
+    <span class="t-icon"><i class="pix-box"></i></span>
+    <span class="t-lbl" data-zh="線材" data-en="Wiki">線材</span>
+  </button>
+  <button class="tab-item" onclick="goTo(4.5)" aria-label="Reference">
+    <span class="t-icon"><i class="pix-book-open"></i></span>
+    <span class="t-lbl" data-zh="參考" data-en="Ref">參考</span>
+  </button>
+</nav>
+
+<script src="./assets/js/app.js"></script>
+<script src="./assets/js/data/fibers.js"></script>
+<script src="./assets/js/data/reference.js"></script>
+<script src="./assets/js/features/shops.js"></script>
+<script src="./assets/js/features/wiki.js"></script>
+<script src="./assets/js/features/reference.js"></script>
+
+</body>
+</html>

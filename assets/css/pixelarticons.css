@@ -1,0 +1,40 @@
+@font-face {
+  font-family: "pixelart-icons-font";
+  src: url('../fonts/pixelart-icons-font.woff2') format('woff2'),
+       url('../fonts/pixelart-icons-font.woff') format('woff'),
+       url('../fonts/pixelart-icons-font.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
+
+[class^="pix-"], [class*=" pix-"] {
+  font-family: 'pixelart-icons-font' !important;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Icon mappings: pix-* → pixelart-icons-font unicode */
+
+/* Navigation / tab bar */
+.pix-home:before              { content: "\eb05"; } /* home */
+.pix-device-calculator:before { content: "\ea4d"; } /* calculator */
+.pix-list:before              { content: "\eb36"; } /* list */
+.pix-map-pin:before           { content: "\eb79"; } /* pin */
+.pix-box:before               { content: "\ea15"; } /* archive */
+.pix-book-open:before         { content: "\ea35"; } /* book-open */
+
+/* Fiber wiki icons */
+.pix-cloud:before             { content: "\ea94"; } /* merino — cloud */
+.pix-heart:before             { content: "\eb03"; } /* cashmere — heart */
+.pix-sun:before               { content: "\ebb2"; } /* cotton — sun */
+.pix-file:before              { content: "\eadf"; } /* linen — file */
+.pix-mood-happy:before        { content: "\eb5b"; } /* alpaca — mood-happy */
+.pix-wind:before              { content: "\ebe3"; } /* mohair — wind */
+.pix-flask:before             { content: "\eb23"; } /* acrylic — label (no flask in set) */
+.pix-mood-neutral:before      { content: "\eb5c"; } /* angora — mood-neutral */

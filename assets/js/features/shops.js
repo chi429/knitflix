@@ -26,11 +26,18 @@ window.toggleOsmPlaceOptions = function toggleOsmPlaceOptions(force) {
   osmPlaceOptionsOpen = typeof force === 'boolean' ? force : !osmPlaceOptionsOpen;
   const wrap = document.getElementById('osmPlaceWrap');
   const btn = document.getElementById('osmPlaceToggle');
+  const geoBtn = document.getElementById('osmGeoBtn');
+  const radiusEl = document.getElementById('osmRadius');
+  const keywordEl = document.getElementById('osmKeyword');
   wrap?.classList.toggle('is-hidden', !osmPlaceOptionsOpen);
   if (btn) {
     btn.classList.toggle('on', osmPlaceOptionsOpen);
     btn.setAttribute('aria-expanded', osmPlaceOptionsOpen ? 'true' : 'false');
   }
+  // If user chose "No GPS", disable the GPS search button to avoid confusion.
+  if (geoBtn) geoBtn.disabled = osmPlaceOptionsOpen;
+  if (radiusEl) radiusEl.disabled = osmPlaceOptionsOpen;
+  if (keywordEl) keywordEl.disabled = osmPlaceOptionsOpen;
   if (osmPlaceOptionsOpen) document.getElementById('osmPlace')?.focus();
 };
 
@@ -132,12 +139,17 @@ function escapeHtml(str) {
   return String(str ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }
 
+/** Escape literal text for Overpass name~"regex" (avoid breaking the query). */
+function escapeOverpassRegex(s) {
+  return String(s).replace(/[\\^$.*+?()[\]{}|]/g, '\\$&');
+}
+
 function normalizeOsmElement(el) {
   const tags = el.tags || {};
   const name = tags.name || tags['name:en'] || tags['name:zh'] || tags['name:ja'] || null;
-  const lat = el.lat ?? el.center?.lat ?? null;
-  const lon = el.lon ?? el.center?.lon ?? null;
-  if (!name || lat === null || lon === null) return null;
+  const lat = Number(el.lat ?? el.center?.lat ?? NaN);
+  const lon = Number(el.lon ?? el.center?.lon ?? NaN);
+  if (!name || !Number.isFinite(lat) || !Number.isFinite(lon)) return null;
 
   const kind =
     tags.shop ? `shop=${tags.shop}` :
@@ -224,13 +236,53 @@ async function geocodePlace(place) {
   return { lat: parseFloat(hit.lat), lon: parseFloat(hit.lon) };
 }
 
+const OVERPASS_ENDPOINTS = [
+  'https://overpass-api.de/api/interpreter',
+  'https://overpass.openstreetmap.fr/api/interpreter'
+];
+
+async function postOverpassQuery(query) {
+  const body = `data=${encodeURIComponent(query)}`;
+  let lastErr = null;
+  for (const url of OVERPASS_ENDPOINTS) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 35000);
+    try {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'content-type': 'application/x-www-form-urlencoded; charset=UTF-8' },
+        body,
+        signal: controller.signal
+      });
+      const text = await res.text();
+      if (!res.ok) {
+        lastErr = new Error(`HTTP ${res.status}`);
+        continue;
+      }
+      let json;
+      try {
+        json = JSON.parse(text);
+      } catch (parseErr) {
+        lastErr = new Error('not_json');
+        continue;
+      }
+      return json;
+    } catch (err) {
+      lastErr = err;
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+  throw lastErr || new Error('overpass_failed');
+}
+
 async function runOverpass(origin, radius, keyword) {
   setOsmRetryVisible(false);
   setOsmStatus(lang === 'zh' ? '搜尋附近中…' : 'Searching nearby…');
 
   // Build a safe, valid Overpass query. (Filters must be attached to each selector.)
-  const safeKw = keyword ? keyword.replace(/["\\]/g, '') : '';
-  const nameFilter = safeKw ? `["name"~"${safeKw}",i]` : '';
+  const safeKw = keyword ? keyword.replace(/["\\]/g, '').trim() : '';
+  const nameFilter = safeKw ? `["name"~"${escapeOverpassRegex(safeKw)}",i]` : '';
   const around = `(around:${radius},${origin.lat},${origin.lon})`;
   const selectors = [
     `nwr${around}[shop=wool]${nameFilter};`,
@@ -244,23 +296,17 @@ async function runOverpass(origin, radius, keyword) {
   const query = `[out:json][timeout:25];(${selectors.join('')})out center tags;`;
 
   try {
-    const res = await fetch('https://overpass-api.de/api/interpreter', {
-      method: 'POST',
-      headers: { 'content-type': 'application/x-www-form-urlencoded; charset=UTF-8' },
-      body: `data=${encodeURIComponent(query)}`
-    });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const json = await res.json();
+    const json = await postOverpassQuery(query);
     const els = Array.isArray(json?.elements) ? json.elements : [];
     const normalized = els.map(normalizeOsmElement).filter(Boolean);
 
     const seen = new Set();
     const out = [];
     for (const s of normalized) {
-      const key = `${s.name.toLowerCase()}|${s.lat.toFixed(5)}|${s.lon.toFixed(5)}`;
+      const key = `${s.name.toLowerCase()}|${Number(s.lat).toFixed(5)}|${Number(s.lon).toFixed(5)}`;
       if (seen.has(key)) continue;
       seen.add(key);
-      out.push({ ...s, distanceM: haversineMeters(origin, { lat: s.lat, lon: s.lon }) });
+      out.push({ ...s, distanceM: haversineMeters(origin, { lat: Number(s.lat), lon: Number(s.lon) }) });
     }
     out.sort((a, b) => (a.distanceM ?? 0) - (b.distanceM ?? 0));
 
@@ -272,7 +318,14 @@ async function runOverpass(origin, radius, keyword) {
     );
     window.renderOsmShops();
   } catch (e) {
-    setOsmStatus(lang === 'zh' ? '搜尋失敗（OSM 服務可能繁忙），請稍後再試。' : 'Search failed (OSM service busy). Try again.');
+    const aborted = e && (e.name === 'AbortError' || e.message === 'The user aborted a request.');
+    const msg =
+      aborted
+        ? (lang === 'zh' ? '連線逾時，請再試一次。' : 'Request timed out. Try again.')
+        : lang === 'zh'
+          ? '搜尋失敗（網絡或 OSM 服務暫時不可用），請稍後再試。'
+          : 'Search failed (network or OSM temporarily unavailable). Try again.';
+    setOsmStatus(msg);
     setOsmRetryVisible(true);
   }
 }

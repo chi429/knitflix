@@ -367,6 +367,20 @@ function setRef(id, btn) {
 
 // Data + renderers (shops + wiki) still live in knitflix.html for now.
 
+/** Google Apps Script / Sheet may return a bare array or { shops, data, rows, ... }. */
+function normalizeShopsPayload(raw) {
+  if (!raw) return [];
+  if (Array.isArray(raw)) return raw;
+  if (typeof raw === 'object') {
+    const keys = ['shops', 'data', 'rows', 'result', 'items', 'records'];
+    for (const k of keys) {
+      if (Array.isArray(raw[k])) return raw[k];
+    }
+    if (raw.data && typeof raw.data === 'object' && Array.isArray(raw.data.rows)) return raw.data.rows;
+  }
+  return [];
+}
+
 document.addEventListener('DOMContentLoaded', function() {
   // Render icons as soon as lucide is ready (don't block on shops fetch).
   // Note: Lucide removed in favor of pixelarticons.
@@ -382,11 +396,13 @@ document.addEventListener('DOMContentLoaded', function() {
   } catch(e) {}
 
   // 1) Fast path: render immediately from cached shops (if available).
+  // Never replace embedded shops with an empty [] (bad cache wipes the list).
   try {
     const cached = localStorage.getItem('knitflix_shops_cache');
     if (cached) {
       const parsed = JSON.parse(cached);
-      if (Array.isArray(parsed)) window.SHOPS = parsed;
+      const arr = normalizeShopsPayload(parsed);
+      if (arr.length > 0) window.SHOPS = arr;
     }
   } catch (e) {}
 
@@ -424,13 +440,21 @@ document.addEventListener('DOMContentLoaded', function() {
           : null;
 
       if (remoteUrl) {
-        const remoteRes = await fetchJsonWithTimeout(remoteUrl, { cache: 'no-store', timeoutMs: 4500 });
+        const remoteRes = await fetchJsonWithTimeout(remoteUrl, { cache: 'no-store', timeoutMs: 12000 });
         if (remoteRes.ok) {
-          const remoteData = await remoteRes.json();
-          if (Array.isArray(remoteData)) {
-            window.SHOPS = remoteData;
+          const text = await remoteRes.text();
+          let parsed;
+          try {
+            parsed = JSON.parse(text);
+          } catch (parseErr) {
+            window.__SHOPS_LOAD_ERROR = 'remote_json';
+            parsed = null;
+          }
+          const remoteRows = normalizeShopsPayload(parsed);
+          if (remoteRows.length > 0) {
+            window.SHOPS = remoteRows;
             try {
-              localStorage.setItem('knitflix_shops_cache', JSON.stringify(remoteData));
+              localStorage.setItem('knitflix_shops_cache', JSON.stringify(remoteRows));
               localStorage.setItem('knitflix_shops_cache_ts', String(Date.now()));
             } catch (e) {}
             window.__SHOPS_CACHE_TS = Date.now();
@@ -444,8 +468,9 @@ document.addEventListener('DOMContentLoaded', function() {
       const localRes = await fetchJsonWithTimeout('./assets/data/shops.json', { cache: 'no-store', timeoutMs: 2500 });
       if (!localRes.ok) return;
       const localData = await localRes.json();
-      if (Array.isArray(localData)) {
-        window.SHOPS = localData;
+      const localRows = normalizeShopsPayload(localData);
+      if (localRows.length > 0) {
+        window.SHOPS = localRows;
         window.__SHOPS_SOURCE = 'local';
         if (typeof renderShops === 'function') renderShops();
       }

@@ -1,0 +1,23 @@
+{
+  "name": "Knitflix",
+  "short_name": "Knitflix",
+  "description": "Cute pastel knitting & crochet toolkit prototype.",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#fbf6ff",
+  "theme_color": "#7c66ff",
+  "icons": [
+    {
+      "src": "./assets/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "./assets/icons/maskable.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ]
+}

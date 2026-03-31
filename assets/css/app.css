@@ -320,9 +320,19 @@ input:focus {
   border-color: var(--gold);
   background: var(--surface2);
 }
+input:disabled{
+  opacity:0.55;
+  cursor:not-allowed;
+  background:rgba(255,255,255,0.55);
+}
 select:focus {
   border-color: var(--gold);
   background: var(--surface2);
+}
+select:disabled{
+  opacity:0.55;
+  cursor:not-allowed;
+  background:rgba(255,255,255,0.55);
 }
 .row2 { display:grid; grid-template-columns:1fr 1fr; gap:var(--s-3); }
 
@@ -343,6 +353,13 @@ select:focus {
   letter-spacing: 0.02em;
 }
 .btn:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0 var(--border); }
+.btn:disabled{
+  opacity:0.55;
+  cursor:not-allowed;
+  filter: grayscale(0.15);
+  transform:none;
+  box-shadow: 4px 4px 0 var(--border);
+}
 .btn + .chip, .chip + .btn { margin-top:var(--s-2); }
 
 /* ── RESULT ── */

@@ -3,7 +3,7 @@
 let shopMode = 'curated'; // 'curated' | 'osm'
 let lastOsmResults = [];
 let lastOsmSearch = null; // { mode: 'geo'|'place', origin, radius, keyword, place }
-let osmPlaceOptionsOpen = true;
+let osmPlaceOptionsOpen = false;
 
 window.setShopMode = function setShopMode(mode, btn) {
   shopMode = mode;
@@ -162,7 +162,7 @@ window.renderOsmShops = function renderOsmShops() {
   const osmLine = document.getElementById('osmSourceLine');
   if (osmLine) osmLine.textContent = lang === 'zh' ? '資料來源: OpenStreetMap（即時搜尋）' : 'Source: OpenStreetMap (live search)';
   if (!lastOsmResults.length) {
-    list.innerHTML = `<div style="text-align:center;padding:32px;color:var(--ink3);font-size:14px;">${lang==='zh'?'按上面按鈕搜尋附近舖頭':'Tap the button above to search nearby'}</div>`;
+    list.innerHTML = '';
     return;
   }
   list.innerHTML = lastOsmResults.map(s => {
@@ -228,16 +228,20 @@ async function runOverpass(origin, radius, keyword) {
   setOsmRetryVisible(false);
   setOsmStatus(lang === 'zh' ? '搜尋附近中…' : 'Searching nearby…');
 
-  const base =
-    `(
-      nwr(around:${radius},${origin.lat},${origin.lon})[shop=wool];
-      nwr(around:${radius},${origin.lat},${origin.lon})[shop=craft];
-      nwr(around:${radius},${origin.lat},${origin.lon})[shop=haberdashery];
-      nwr(around:${radius},${origin.lat},${origin.lon})[craft=knitting];
-      nwr(around:${radius},${origin.lat},${origin.lon})[craft=sewing];
-    );`;
-  const kw = keyword ? `["name"~"${keyword.replace(/["\\]/g, '')}",i]` : '';
-  const query = `[out:json][timeout:25];(${base.replace(/\n/g, '')})${kw}out center tags;`;
+  // Build a safe, valid Overpass query. (Filters must be attached to each selector.)
+  const safeKw = keyword ? keyword.replace(/["\\]/g, '') : '';
+  const nameFilter = safeKw ? `["name"~"${safeKw}",i]` : '';
+  const around = `(around:${radius},${origin.lat},${origin.lon})`;
+  const selectors = [
+    `nwr${around}[shop=wool]${nameFilter};`,
+    `nwr${around}[shop=craft]${nameFilter};`,
+    `nwr${around}[shop=haberdashery]${nameFilter};`,
+    `nwr${around}[shop=fabric]${nameFilter};`,
+    `nwr${around}[shop=doityourself]${nameFilter};`,
+    `nwr${around}[craft=knitting]${nameFilter};`,
+    `nwr${around}[craft=sewing]${nameFilter};`
+  ];
+  const query = `[out:json][timeout:25];(${selectors.join('')})out center tags;`;
 
   try {
     const res = await fetch('https://overpass-api.de/api/interpreter', {

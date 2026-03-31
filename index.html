@@ -268,15 +268,15 @@
           </div>
           <button class="btn" onclick="searchOsmShops()" data-zh="用我位置搜尋 →" data-en="Search using my location →">用我位置搜尋 →</button>
           <button
-            class="chip chip-as-label on"
+            class="chip chip-as-label"
             id="osmPlaceToggle"
             onclick="toggleOsmPlaceOptions()"
             aria-controls="osmPlaceWrap"
-            aria-expanded="true"
+            aria-expanded="false"
             data-zh="唔用定位：輸入地區"
             data-en="No GPS: search by place"
           ><span class="tog-label">唔用定位：輸入地區</span><span class="pix-toggle-ui" aria-hidden="true"></span></button>
-          <div id="osmPlaceWrap" style="margin-top:var(--s-2);">
+          <div id="osmPlaceWrap" class="is-hidden" style="margin-top:var(--s-2);">
             <label data-zh="地區 / 城市" data-en="Area / City">地區 / 城市</label>
             <input type="text" id="osmPlace" class="shop-search" placeholder="例如：旺角 / Mong Kok / Tokyo" style="margin-bottom:var(--s-2)">
             <button class="btn" onclick="searchOsmByPlace(true)" data-zh="用地區搜尋 →" data-en="Search this place →">用地區搜尋 →</button>

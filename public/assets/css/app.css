@@ -372,6 +372,7 @@ select:focus {
 
 /* ── CHIPS ── */
 .chip-row { display:flex; flex-wrap:wrap; gap:var(--s-2); margin-bottom:var(--s-4); }
+.chip-row#osmActions{ justify-content:center; }
 .chip {
   padding:var(--s-1) var(--s-3); border:2px solid var(--ink); background:var(--surface);
   cursor:pointer; color:var(--ink); transition:all 0.1s;

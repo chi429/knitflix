@@ -1,6 +1,6 @@
 ## Knitflix
 
-Cute pastel knitting & crochet toolkit prototype (HTML/CSS/JS).
+Knitting & crochet toolkit for Hong Kong · 織冷工具箱 (plain HTML/CSS/JS on Vite).
 
 ### Run locally
 
@@ -13,21 +13,29 @@ npm run dev
 ```
 
 Open:
-- Vite will open the app automatically, or visit `http://localhost:5173/`
+- Vite opens `http://localhost:5173/app/` automatically
 
 Legacy redirect:
-- `http://localhost:5173/knitflix.html`
+- `http://localhost:5173/knitflix.html` → `/app/`
 
 ### Project structure
 
-- `index.html`: main UI markup
-- `knitflix.html`: redirect for legacy URL
-- `assets/css/app.css`: app styles (theme + components)
-- `assets/js/app.js`: core app logic (navigation, lang toggle, counter, calc, toast)
-- `assets/data/shops.json`: local fallback shop dataset
-- `assets/js/data/fibers.js`: fiber wiki dataset (`window.FIBERS`, icons, labels)
-- `assets/js/features/shops.js`: shops rendering/filtering
-- `assets/js/features/wiki.js`: wiki rendering/search
+Site: `knitflix.gracelee.me` (Vercel, deploys from `main`).
+
+- `index.html`: the landing page at `/` (for now a redirect to `/app/`)
+- `app/index.html`: the toolkit at `/app/` — six tools, one per URL hash: `#home` `#calc` `#rows` `#shops` `#wiki` `#ref`
+- `knitflix.html`: redirect for the legacy URL
+- `public/`: served as-is at the domain root (no bundling — the scripts are classic, not modules)
+  - `assets/css/tokens.css`: colours, type, spacing (shared by app and landing)
+  - `assets/css/app.css`: app styles (components)
+  - `assets/js/app.js`: core app logic (navigation + hash routing, lang toggle, counter, calc, toast)
+  - `assets/js/data/fibers.js`, `reference.js`, `shops.js`: datasets
+  - `assets/js/features/shops.js`, `wiki.js`, `reference.js`: rendering per tool
+  - `assets/data/shops.json`: local fallback shop dataset
+  - `site.webmanifest`: PWA manifest (`start_url` is `/app/`)
+- `vite.config.js`: three HTML entries (`/`, `/app/`, `knitflix.html`), `base: '/'`
+
+Open `http://localhost:5173/app/` in dev.
 
 ### Shops data (Google Sheet + Apps Script)
 

@@ -1,47 +1,4 @@
-:root {
-  /* Pastel · 日系 · Sailor Moon–inspired · futuristic iridescent · 8-bit */
-  --bg: #fbf0ff;          /* lavender-milk base (slightly stronger) */
-  --surface: #ffffff;
-  --surface2: #fffaff;    /* sakura wash */
-
-  --rust: #ff99cc;        /* bright sakura pink */
-  --gold: #cc99ff;        /* moon lavender */
-  --sage: #99ffff;        /* mint / transformation flash */
-  --moon: #ffffcc;        /* sailor moon yellow */
-
-  --ink: #332244;         /* deep purple ink */
-  --ink2: rgba(51,34,68,0.85);
-  --ink3: rgba(51,34,68,0.65);
-  --border: rgba(204,153,255,0.3);
-  --shadow: rgba(51,34,68,0.12);
-  --header-h: 64px;
-  --tab-h: 76px;
-  --safe-b: env(safe-area-inset-bottom, 0px);
-  --px: 1px;
-  --radius: 0px;          /* Pixel style: no rounded corners */
-  --radius-sm: 0px;
-  --radius-lg: 0px;
-  --radius-pill: 0px;
-  --stroke: rgba(204,153,255,0.2);
-  --stroke-strong: rgba(204,153,255,0.4);
-  --iris: linear-gradient(125deg, #ffb7ff 0%, #cc99ff 35%, #99ccff 65%, #b2e0ff 100%);
-  
-  --font-logo: 'Silkscreen', monospace;
-  --font-ui: 'Noto Sans HK', sans-serif;
-  --font-body: 'Noto Sans HK', sans-serif;
-  --font-display: 'Noto Sans HK', sans-serif;
-  
-  --grid-line: rgba(204,153,255,0.22);
-
-  /* ── SPACING SCALE ── */
-  --s-1: 4px;
-  --s-2: 8px;
-  --s-3: 12px;
-  --s-4: 16px;
-  --s-5: 24px;
-  --s-6: 32px;
-  --s-7: 48px;
-}
+/* Knitflix app styles. Tokens live in tokens.css (load it first). */
 * { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; image-rendering: pixelated; }
 html, body { height:100%; overflow:hidden; }
 body {

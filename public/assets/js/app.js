@@ -7,6 +7,8 @@ const refPanels = ['sym-crochet','sym-knit','uk-us','hook-sz','knit-sz'];
 // panels: home=0,calc=1,count=2,shops=3,wiki=4,ref=5
 // tabs:   0=home,1=calc,2=count,3=shops,4=wiki,4.5=ref
 const PANEL_IDS = ['p-home','p-calc','p-count','p-shops','p-wiki','p-ref'];
+// URL hashes, one per panel: /app/#rows opens the row counter, back button works
+const PANEL_HASH = ['home','calc','rows','shops','wiki','ref'];
 const TAB_TO_PANEL = {0:0, 1:1, 2:2, 3:3, 4:4, 4.5:5};
 let currentPanel = 0;
 let undoTimer = null, prevRowCount = 0;
@@ -62,10 +64,17 @@ function goTo(tabIdx) {
     }
   });
 
-  function goToPanel(idx) {
+  function goToPanel(idx, opts) {
     if (idx < 0 || idx >= PANELS) return;
+    const instant = opts && opts.instant;
     currentPanel = idx;
+    if (instant) track.style.transition = 'none';
     track.style.transform = `translateX(-${idx * 100}%)`;
+    if (instant) { void track.offsetWidth; track.style.transition = ''; }
+    const hash = '#' + PANEL_HASH[idx];
+    if (location.hash !== hash) {
+      if (opts && opts.replace) history.replaceState(null, '', hash); else location.hash = hash;
+    }
     const tMap = [0,1,2,3,4,4.5];
     document.querySelectorAll('.tab-item').forEach((b,i) => {
       const isActive = TAB_TO_PANEL[tMap[i]] === idx;
@@ -77,6 +86,15 @@ function goTo(tabIdx) {
     if (idx === 0) updateHeroBadge();
   }
   window._goToPanel = goToPanel;
+
+  // hash -> panel: on load (no slide) and on back/forward
+  function panelFromHash() {
+    const i = PANEL_HASH.indexOf(location.hash.replace('#', ''));
+    return i < 0 ? 0 : i;
+  }
+  window.addEventListener('hashchange', () => { const i = panelFromHash(); if (i !== currentPanel) goToPanel(i); });
+  const start = panelFromHash();
+  if (start !== 0) goToPanel(start, { instant: true, replace: true }); else history.replaceState(null, '', '#home');
 })();
 
 function toggleLang() {

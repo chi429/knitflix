@@ -31,6 +31,7 @@ Site: `knitflix.gracelee.me` (Vercel, deploys from `main`).
   - `assets/js/app.js`: core app logic (navigation + hash routing, lang toggle, counter, calc, toast)
   - `assets/js/data/fibers.js`, `reference.js`, `shops.js`: datasets
   - `assets/js/features/shops.js`, `wiki.js`, `reference.js`: rendering per tool
+  - `assets/js/features/pattern.js`: AI pattern explainer (Ref → 解讀)
   - `assets/data/shops.json`: local fallback shop dataset
   - `site.webmanifest`: PWA manifest (`start_url` is `/app/`)
 - `vite.config.js`: three HTML entries (`/`, `/app/`, `knitflix.html`), `base: '/'`
@@ -144,3 +145,31 @@ Then the page will be available at:
 - `.../` (recommended)
 - `.../knitflix.html`
 
+
+### Pattern explainer (Ref → 解讀)
+
+Paste an English knitting or crochet pattern; an AI model explains each abbreviation and translates the pattern line by line (Traditional Chinese, or English when the app is in EN). The answer streams in as it's written, can be stopped part-way, and keeps whatever arrived if the connection drops.
+
+- Frontend: `public/assets/js/features/pattern.js`
+- Backend: `api/explain-pattern.js`, a Vercel Function that calls an OpenAI-compatible chat API with `fetch` and streams plain text back. No SDK, no extra dependencies.
+
+#### Setup (free)
+
+Defaults to Groq's free tier (no credit card) with `qwen/qwen3.8-27b`.
+
+1. Sign up at https://console.groq.com and create an API key.
+2. In Vercel → Project → Settings → Environment Variables, add `LLM_API_KEY` with that key.
+3. Redeploy.
+
+Free-tier limits apply (see https://console.groq.com/docs/rate-limits). When they're hit, the app shows a "try again later" message.
+
+To use another OpenAI-compatible provider, also set `LLM_BASE_URL` and `LLM_MODEL` (and `LLM_REASONING_EFFORT` if the model needs it). `ALLOWED_ORIGINS` adds extra sites allowed to call the endpoint, comma-separated.
+
+#### Run locally
+
+`npm run dev` (Vite) doesn't run the `/api` function. Use the Vercel CLI instead:
+
+```bash
+cp .env.example .env.local   # then paste your key into .env.local
+npx vercel dev
+```

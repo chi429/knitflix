@@ -797,3 +797,54 @@ input.err { border-color:var(--rust) !important; background:rgba(255,153,204,0.1
   box-shadow: 3px 3px 0 var(--border);
 }
 .swatch-tip-box.show { display:block; }
+
+/* ── PATTERN EXPLAINER (Ref → 解讀) ── */
+.pat-intro { font-size:12px; color:var(--ink2); line-height:1.7; margin:0 0 var(--s-3); }
+.pat-input {
+  display:block; width:100%; min-height:140px; resize:vertical;
+  padding:var(--s-3); border:2px solid var(--ink);
+  background:var(--surface); color:var(--ink);
+  font-family:var(--font-body); font-size:15px; line-height:1.6;
+  box-shadow: inset 2px 2px 0 rgba(0,0,0,0.05); outline:none;
+}
+.pat-input:focus { border-color:var(--gold); background:var(--surface2); }
+.pat-input:focus-visible { outline:2px solid var(--gold); outline-offset:2px; }
+.pat-input[readonly] { opacity:0.7; }
+.pat-meta { display:flex; justify-content:space-between; align-items:center; gap:var(--s-2); margin:var(--s-2) 0 var(--s-1); }
+.pat-link {
+  border:none; background:none; padding:var(--s-1) 0; cursor:pointer;
+  font:700 12px var(--font-ui); color:var(--ink2);
+  text-decoration:underline; text-decoration-color:var(--gold); text-decoration-thickness:2px; text-underline-offset:3px;
+}
+.pat-link:focus-visible { outline:2px solid var(--gold); outline-offset:2px; }
+.pat-count { font-size:11px; color:var(--ink3); font-variant-numeric:tabular-nums; }
+.pat-count.is-over { color:var(--rust); font-weight:700; }
+.btn.pat-stop { background:var(--surface); color:var(--ink); }
+.pat-status { font-size:12px; color:var(--ink3); margin-top:var(--s-2); min-height:1em; }
+.pat-status.is-err { color:#c2185b; font-weight:700; }
+.pat-result #patOut { font-size:14px; line-height:1.7; color:var(--ink); }
+.pat-result .pat-h { margin:var(--s-4) 0 var(--s-2); }
+.pat-result .pat-h:first-child { margin-top:0; }
+.pat-abbr { border:2px solid var(--ink); background:var(--surface); }
+.pat-abbr-row { display:grid; grid-template-columns:minmax(64px, auto) 1fr; gap:var(--s-3); padding:var(--s-2) var(--s-3); }
+.pat-abbr-row + .pat-abbr-row { border-top:1px solid var(--grid-line); }
+.pat-abbr-key {
+  align-self:start; justify-self:start; padding:2px 6px;
+  background:var(--moon); border:2px solid var(--ink);
+  font:700 13px var(--font-ui); white-space:nowrap;
+}
+.pat-abbr-en { font-size:12px; color:var(--ink3); }
+.pat-abbr-zh { font-size:14px; }
+.pat-src { margin:var(--s-3) 0 0; font-size:12px; color:var(--ink3); font-style:italic; overflow-wrap:anywhere; }
+.pat-tr { margin:2px 0 0; padding-left:var(--s-3); border-left:3px solid var(--gold); }
+.pat-note { margin:var(--s-1) 0 0; padding-left:var(--s-4); position:relative; }
+.pat-note::before { content:''; position:absolute; left:2px; top:0.65em; width:6px; height:6px; background:var(--rust); }
+.pat-foot { margin-top:var(--s-4); padding-top:var(--s-3); border-top:2px dashed var(--grid-line); }
+.pat-disclaimer { font-size:11px; color:var(--ink3); line-height:1.6; margin:0 0 var(--s-2); }
+/* A pixel "stitch" that blinks while Claude is still writing */
+.pat-caret {
+  display:inline-block; width:8px; height:14px; margin-left:3px; vertical-align:-2px;
+  background:var(--gold); animation: pat-blink 0.9s steps(1) infinite;
+}
+@keyframes pat-blink { 50% { opacity:0; } }
+@media (prefers-reduced-motion: reduce) { .pat-caret { animation:none; } }

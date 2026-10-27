@@ -316,6 +316,7 @@
         <button class="pill-btn" onclick="setRef('uk-us',this)" data-zh="UK↔US" data-en="UK↔US">UK↔US</button>
         <button class="pill-btn" onclick="setRef('hook-sz',this)" data-zh="鈎針號" data-en="Hooks">鈎針號</button>
         <button class="pill-btn" onclick="setRef('knit-sz',this)" data-zh="棒針號" data-en="Needles">棒針號</button>
+        <button class="pill-btn" onclick="setRef('pat-ai',this)" data-zh="解讀" data-en="Explain">解讀</button>
       </div>
       <div class="card" id="sym-crochet">
         <div class="sym-table" id="symCrochetTable"></div>
@@ -332,6 +333,26 @@
       </div>
       <div class="card" id="knit-sz" style="display:none">
         <div id="needleSizeTable"></div>
+      </div>
+      <div class="card" id="pat-ai" style="display:none">
+        <div class="card-label" data-zh="解讀英文 Pattern" data-en="Explain a pattern">解讀英文 Pattern</div>
+        <p class="pat-intro" data-zh="貼上一段英文 pattern，AI 會解釋入面嘅縮寫，再逐行翻譯做中文。" data-en="Paste an English pattern. AI explains the abbreviations, then walks through it line by line.">貼上一段英文 pattern，AI 會解釋入面嘅縮寫，再逐行翻譯做中文。</p>
+        <label for="patIn" data-zh="Pattern" data-en="Pattern">Pattern</label>
+        <textarea id="patIn" class="pat-input" rows="7" spellcheck="false" autocapitalize="off" maxlength="6000"></textarea>
+        <div class="pat-meta">
+          <button type="button" class="pat-link" onclick="patternSample()" data-zh="用範例試吓" data-en="Try a sample">用範例試吓</button>
+          <span id="patCount" class="pat-count" aria-live="off"></span>
+        </div>
+        <button type="button" class="btn" id="patGo" onclick="patternExplain()" data-zh="解讀" data-en="Explain">解讀</button>
+        <button type="button" class="btn pat-stop" id="patStop" onclick="patternStop()" hidden data-zh="停止" data-en="Stop">停止</button>
+        <div class="pat-status" id="patStatus" role="status" aria-live="polite"></div>
+        <div class="result-box pat-result" id="patResult" aria-live="polite" aria-busy="false">
+          <div id="patOut"></div>
+          <div class="pat-foot" id="patFoot" hidden>
+            <p class="pat-disclaimer" data-zh="AI 解讀可能有錯。開工前對返原本 pattern，或者睇吓「鈎針」、「針織」同「UK↔US」對照表。" data-en="AI can get things wrong. Check against the original pattern, or the Crochet, Knitting and UK↔US tables, before you start.">AI 解讀可能有錯。開工前對返原本 pattern，或者睇吓「鈎針」、「針織」同「UK↔US」對照表。</p>
+            <button type="button" class="chip" onclick="patternCopy()" data-zh="複製解讀" data-en="Copy explanation">複製解讀</button>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -372,6 +393,7 @@
 <script src="/assets/js/features/shops.js"></script>
 <script src="/assets/js/features/wiki.js"></script>
 <script src="/assets/js/features/reference.js"></script>
+<script src="/assets/js/features/pattern.js"></script>
 
 </body>
 </html>

@@ -2,7 +2,7 @@
 
 // Use `var` so feature scripts can access these globals.
 var lang = 'zh', rowCount = 0, areaFilter = 'all';
-const refPanels = ['sym-crochet','sym-knit','uk-us','hook-sz','knit-sz'];
+const refPanels = ['sym-crochet','sym-knit','uk-us','hook-sz','knit-sz','pat-ai'];
 
 // panels: home=0,calc=1,count=2,shops=3,wiki=4,ref=5
 // tabs:   0=home,1=calc,2=count,3=shops,4=wiki,4.5=ref
@@ -106,6 +106,7 @@ function toggleLang() {
   if (typeof renderShops === 'function') renderShops();
   if (typeof renderWiki === 'function') renderWiki();
   if (typeof renderReference === 'function') renderReference(true);
+  if (typeof renderPatternLang === 'function') renderPatternLang();
   updateProg();
 }
 
